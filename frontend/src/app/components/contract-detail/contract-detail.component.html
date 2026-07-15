@@ -1,0 +1,13 @@
+<div *ngIf="alertaCritica" style="background-color: #D32F2F; color: white; padding: 1rem; text-align: center; font-weight: bold; animation: pulse 1.5s infinite;">
+  ¡ALERTA! Este contrato está próximo a vencer.
+</div>
+
+<div *ngIf="contrato" style="padding: 2rem;">
+  <h1>Detalle del Contrato</h1>
+  <p><strong>Número:</strong> {{ contrato.numero_contrato }}</p>
+  <p><strong>Administradora:</strong> {{ contrato.administradora?.nombre }}</p>
+  <p><strong>Modalidad:</strong> {{ contrato.modalidad }}</p>
+  <p><strong>Fecha fin:</strong> {{ contrato.fecha_fin }}</p>
+  <p><strong>Estado:</strong> {{ contrato.estado }}</p>
+  <p><strong>Objeto:</strong> {{ contrato.objeto }}</p>
+</div>

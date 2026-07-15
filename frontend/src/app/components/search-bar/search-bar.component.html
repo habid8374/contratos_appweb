@@ -1,0 +1,16 @@
+<div class="search-container">
+  <h3>Buscador de Contratos</h3>
+  <input type="text" [formControl]="searchControl" placeholder="Buscar administradora o número de contrato..." />
+
+  <div *ngIf="isLoading" class="loading">Buscando...</div>
+
+  <ul *ngIf="(resultados$ | async) as resultados">
+    <li *ngFor="let contrato of resultados">
+      <button type="button" (click)="seleccionarContrato(contrato.id)">
+        <strong>{{ contrato.numero_contrato }}</strong>
+        <span>{{ contrato.administradora?.nombre }}</span>
+      </button>
+    </li>
+    <li *ngIf="resultados.length === 0 && searchControl.value">No se encontraron contratos.</li>
+  </ul>
+</div>
