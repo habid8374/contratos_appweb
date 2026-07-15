@@ -1,4 +1,5 @@
 import os
+from urllib.parse import unquote, urlparse
 
 """
 Django settings for clinica_centro_api project.
@@ -43,6 +44,22 @@ def env_list(name: str, default: list[str] | None = None) -> list[str]:
     if not value:
         return default or []
     return [item.strip() for item in value.split(',') if item.strip()]
+
+
+def database_from_url(url: str) -> dict[str, str]:
+    parsed = urlparse(url)
+    scheme = parsed.scheme.replace('postgresql', 'postgres')
+    if scheme != 'postgres':
+        raise ValueError('DATABASE_URL must use postgres:// or postgresql://')
+
+    return {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': unquote(parsed.path.lstrip('/')),
+        'USER': unquote(parsed.username or ''),
+        'PASSWORD': unquote(parsed.password or ''),
+        'HOST': parsed.hostname or '',
+        'PORT': str(parsed.port or 5432),
+    }
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -120,8 +137,10 @@ WSGI_APPLICATION = 'clinica_centro_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+DATABASE_URL = os.getenv('DATABASE_URL')
+
 DATABASES = {
-    'default': {
+    'default': database_from_url(DATABASE_URL) if DATABASE_URL else {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('POSTGRES_DB') or os.getenv('PGDATABASE', 'clinica_centro'),
         'USER': os.getenv('POSTGRES_USER') or os.getenv('PGUSER', 'postgres'),
