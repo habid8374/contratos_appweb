@@ -63,6 +63,8 @@ SECRET_KEY = os.getenv(
 DEBUG = env_bool('DJANGO_DEBUG', True)
 
 ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS', ['localhost', '127.0.0.1'])
+CSRF_TRUSTED_ORIGINS = env_list('DJANGO_CSRF_TRUSTED_ORIGINS', [])
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -121,11 +123,11 @@ WSGI_APPLICATION = 'clinica_centro_api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB', 'clinica_centro'),
-        'USER': os.getenv('POSTGRES_USER', 'postgres'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'postgres'),
-        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
-        'PORT': os.getenv('POSTGRES_PORT', '5432'),
+        'NAME': os.getenv('POSTGRES_DB') or os.getenv('PGDATABASE', 'clinica_centro'),
+        'USER': os.getenv('POSTGRES_USER') or os.getenv('PGUSER', 'postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD') or os.getenv('PGPASSWORD', 'postgres'),
+        'HOST': os.getenv('POSTGRES_HOST') or os.getenv('PGHOST', 'localhost'),
+        'PORT': os.getenv('POSTGRES_PORT') or os.getenv('PGPORT', '5432'),
     }
 }
 
