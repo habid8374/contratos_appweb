@@ -55,6 +55,14 @@ import { ApiService, Administradora, Contrato } from '../../services/api.service
           <span>Valor total</span>
           <input type="number" formControlName="valor_total" step="0.01" />
         </label>
+        <label class="form-field">
+          <span>Manual de referencia</span>
+          <input type="text" formControlName="manual_referencia" placeholder="Ej: ISS 2001, SOAT, Propio" />
+        </label>
+        <label class="form-field">
+          <span>Porcentaje pactado (%)</span>
+          <input type="number" formControlName="porcentaje_negociado" step="0.01" placeholder="Ej: 35" />
+        </label>
         <label class="form-field full">
           <span>Objeto</span>
           <textarea rows="3" formControlName="objeto"></textarea>
@@ -130,6 +138,8 @@ export class ContratoFormComponent implements OnInit {
     fecha_inicio: ['', Validators.required],
     fecha_fin: ['', Validators.required],
     valor_total: this.fb.control<number | null>(null),
+    manual_referencia: [''],
+    porcentaje_negociado: this.fb.control<number | null>(0),
     objeto: [''],
     alerta: this.fb.group({
       dias_previos: [90, Validators.required],
@@ -154,6 +164,8 @@ export class ContratoFormComponent implements OnInit {
           fecha_inicio: c.fecha_inicio ?? '',
           fecha_fin: c.fecha_fin ?? '',
           valor_total: c.valor_total ? Number(c.valor_total) : null,
+          manual_referencia: c.manual_referencia ?? '',
+          porcentaje_negociado: c.porcentaje_negociado ? Number(c.porcentaje_negociado) : 0,
           objeto: c.objeto ?? '',
           alerta: {
             dias_previos: c.alerta?.dias_previos ?? 90,

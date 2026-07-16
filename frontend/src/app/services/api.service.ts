@@ -31,6 +31,8 @@ export interface Contrato {
   fecha_inicio?: string;
   fecha_fin?: string;
   valor_total?: string;
+  manual_referencia?: string;
+  porcentaje_negociado?: string;
   estado: string;
   regimen_estimado?: string;
   documento_negociacion?: string | null;

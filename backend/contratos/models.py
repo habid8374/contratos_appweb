@@ -55,6 +55,14 @@ class Contrato(models.Model):
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     valor_total = models.DecimalField(max_digits=19, decimal_places=2, null=True, blank=True)
+    manual_referencia = models.CharField(
+        max_length=120, blank=True, default='',
+        help_text='Manual tarifario base, p. ej. ISS 2001, SOAT, Propio.',
+    )
+    porcentaje_negociado = models.DecimalField(
+        max_digits=6, decimal_places=2, default=0,
+        help_text='Porcentaje pactado sobre el manual (p. ej. 35.00 para +35%).',
+    )
     estado = models.CharField(max_length=3, choices=Estado.choices, default=Estado.ACTIVO)
     documento_negociacion = models.FileField(
         upload_to=negociacion_upload_path, null=True, blank=True,
