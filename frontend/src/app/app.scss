@@ -17,6 +17,7 @@
 }
 
 .app-header {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -31,10 +32,11 @@
     align-items: center;
     gap: 0.75rem;
     text-decoration: none;
+    min-width: 0;
   }
 
   .brand-logo {
-    height: 40px;
+    height: 38px;
     width: auto;
     display: block;
   }
@@ -45,7 +47,21 @@
     color: var(--navy);
     border-left: 2px solid #e5e7eb;
     padding-left: 0.75rem;
+    white-space: nowrap;
   }
+}
+
+/* Botón hamburguesa: oculto en escritorio */
+.menu-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  color: var(--navy);
 }
 
 .app-nav {
@@ -60,6 +76,7 @@
     text-decoration: none;
     font-weight: 500;
     font-size: 0.92rem;
+    white-space: nowrap;
 
     &:hover {
       background: rgba(30, 139, 156, 0.1);
@@ -77,6 +94,7 @@
     font-weight: 500;
     font-size: 0.9rem;
     cursor: pointer;
+    white-space: nowrap;
 
     &:hover {
       background: var(--navy);
@@ -102,6 +120,7 @@
   background: var(--navy);
   color: #cdd7e1;
   font-size: 0.85rem;
+  text-align: center;
 
   .footer-mark {
     height: 22px;
@@ -114,13 +133,58 @@
   }
 }
 
-@media (max-width: 640px) {
+/* ---------- Móvil ---------- */
+@media (max-width: 820px) {
   .app-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.6rem;
+    flex-wrap: wrap;
+    padding: 0.55rem 1rem;
   }
+
+  .brand-logo {
+    height: 32px;
+  }
+
   .brand-app {
     font-size: 0.95rem;
+    padding-left: 0.6rem;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* El menú colapsa y ocupa todo el ancho debajo del header */
+  .app-nav {
+    display: none;
+    order: 3;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.15rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #eef1f4;
+
+    &.abierto {
+      display: flex;
+    }
+
+    .nav-link {
+      padding: 0.7rem 0.85rem;
+      font-size: 1rem;
+      border-radius: 10px;
+    }
+
+    .nav-logout {
+      margin: 0.3rem 0 0;
+      padding: 0.7rem 0.85rem;
+      text-align: center;
+      font-size: 1rem;
+    }
+  }
+
+  .app-main {
+    padding: 1.1rem 1rem;
   }
 }

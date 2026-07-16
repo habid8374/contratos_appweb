@@ -1,16 +1,26 @@
 <header class="app-header">
-  <a routerLink="/" class="brand">
+  <a routerLink="/" class="brand" (click)="cerrarMenu()">
     <img src="assets/brand/axentia-logo.png" alt="Axentia Technologies" class="brand-logo" />
     <span class="brand-app">AppWeb Contratos</span>
   </a>
 
   @if (auth.isAuthenticated()) {
-    <nav class="app-nav">
-      <a routerLink="/" class="nav-link">Inicio</a>
-      <a routerLink="/administradoras" class="nav-link">Administradoras</a>
-      <a routerLink="/alertas" class="nav-link">Alertas</a>
-      <a routerLink="/buscar" class="nav-link">Buscar</a>
-      <a routerLink="/cargar" class="nav-link">Cargar</a>
+    <button
+      type="button"
+      class="menu-toggle"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuAbierto()"
+      aria-label="Menú"
+    >
+      {{ menuAbierto() ? '✕' : '☰' }}
+    </button>
+
+    <nav class="app-nav" [class.abierto]="menuAbierto()">
+      <a routerLink="/" class="nav-link" (click)="cerrarMenu()">Inicio</a>
+      <a routerLink="/administradoras" class="nav-link" (click)="cerrarMenu()">Administradoras</a>
+      <a routerLink="/alertas" class="nav-link" (click)="cerrarMenu()">Alertas</a>
+      <a routerLink="/buscar" class="nav-link" (click)="cerrarMenu()">Buscar</a>
+      <a routerLink="/cargar" class="nav-link" (click)="cerrarMenu()">Cargar</a>
       <button type="button" class="nav-logout" (click)="cerrarSesion()">Salir</button>
     </nav>
   }

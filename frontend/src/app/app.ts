@@ -13,7 +13,18 @@ export class App {
   protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
+  menuAbierto = signal(false);
+
+  toggleMenu(): void {
+    this.menuAbierto.update((v) => !v);
+  }
+
+  cerrarMenu(): void {
+    this.menuAbierto.set(false);
+  }
+
   cerrarSesion(): void {
+    this.cerrarMenu();
     this.auth.logout();
     this.router.navigate(['/login']);
   }
