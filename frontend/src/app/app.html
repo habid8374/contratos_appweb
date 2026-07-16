@@ -10,12 +10,16 @@
       class="menu-toggle"
       (click)="toggleMenu()"
       [attr.aria-expanded]="menuAbierto()"
-      aria-label="Menú"
+      aria-label="Abrir menú"
     >
-      {{ menuAbierto() ? '✕' : '☰' }}
+      ☰
     </button>
 
     <nav class="app-nav" [class.abierto]="menuAbierto()">
+      <div class="nav-drawer-head">
+        <span>Menú</span>
+        <button type="button" class="nav-close" (click)="cerrarMenu()" aria-label="Cerrar menú">✕</button>
+      </div>
       <a routerLink="/" class="nav-link" (click)="cerrarMenu()">Inicio</a>
       <a routerLink="/administradoras" class="nav-link" (click)="cerrarMenu()">Administradoras</a>
       <a routerLink="/alertas" class="nav-link" (click)="cerrarMenu()">Alertas</a>
@@ -25,6 +29,10 @@
     </nav>
   }
 </header>
+
+@if (auth.isAuthenticated()) {
+  <div class="nav-overlay" [class.visible]="menuAbierto()" (click)="cerrarMenu()"></div>
+}
 
 <main class="app-main">
   <router-outlet />
