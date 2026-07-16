@@ -6,6 +6,20 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
+
+class MeView(APIView):
+    """Devuelve los datos del usuario autenticado (para el frontend)."""
+
+    def get(self, request):
+        u = request.user
+        return Response({
+            'id': u.id,
+            'username': u.username,
+            'nombre': u.get_full_name() or u.username,
+            'email': u.email,
+            'is_staff': u.is_staff,
+        })
+
 from .models import Contrato, AnexoTarifario, DetalleTarifa
 from .serializers import (
     ContratoBusquedaSerializer,
