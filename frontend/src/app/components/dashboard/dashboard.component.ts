@@ -21,6 +21,12 @@ export class DashboardComponent {
 
   acciones: Accion[] = [
     {
+      titulo: 'Administradoras / EPS',
+      descripcion: 'Crea y configura administradoras y sus contratos.',
+      ruta: '/administradoras',
+      icono: '🏢',
+    },
+    {
       titulo: 'Buscar contratos',
       descripcion: 'Consulta contratos por administradora, NIT o número.',
       ruta: '/buscar',

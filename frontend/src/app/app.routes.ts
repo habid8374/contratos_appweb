@@ -23,9 +23,51 @@ export const routes: Routes = [
     path: 'cargar',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./components/anexo-upload/anexo-upload.component').then(
-        (m) => m.AnexoUploadComponent,
+      import('./components/anexo-upload/anexo-upload.component').then((m) => m.AnexoUploadComponent),
+  },
+  {
+    path: 'administradoras',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/administradoras/administradoras-list.component').then(
+        (m) => m.AdministradorasListComponent,
       ),
+  },
+  {
+    path: 'administradoras/nueva',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/administradoras/administradora-form.component').then(
+        (m) => m.AdministradoraFormComponent,
+      ),
+  },
+  {
+    path: 'administradoras/:id/editar',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/administradoras/administradora-form.component').then(
+        (m) => m.AdministradoraFormComponent,
+      ),
+  },
+  {
+    path: 'administradoras/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/administradoras/administradora-detalle.component').then(
+        (m) => m.AdministradoraDetalleComponent,
+      ),
+  },
+  {
+    path: 'contratos/nuevo',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/contratos/contrato-form.component').then((m) => m.ContratoFormComponent),
+  },
+  {
+    path: 'contratos/:id/editar',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/contratos/contrato-form.component').then((m) => m.ContratoFormComponent),
   },
   {
     path: 'contratos/:id',
