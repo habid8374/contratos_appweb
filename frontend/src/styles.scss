@@ -193,3 +193,49 @@ table.tabla tbody tr:hover {
   background: #fdeaea;
   color: var(--danger);
 }
+
+/* ---------- Ajustes móviles ---------- */
+@media (max-width: 640px) {
+  .page-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .page-head h1 {
+    font-size: 1.3rem;
+  }
+
+  .card {
+    padding: 1.1rem;
+    border-radius: 12px;
+  }
+
+  /* Botones con mejor área táctil y que quepan */
+  .btn {
+    padding: 0.65rem 1rem;
+  }
+  .btn-sm {
+    padding: 0.45rem 0.75rem;
+  }
+
+  /* Formularios: una sola columna y acciones a lo ancho */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-actions {
+    flex-direction: column;
+  }
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Tablas: fuente algo menor; el contenedor ya hace scroll horizontal */
+  table.tabla {
+    font-size: 0.84rem;
+  }
+  table.tabla th,
+  table.tabla td {
+    padding: 0.55rem 0.65rem;
+  }
+}
+
