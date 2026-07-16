@@ -17,19 +17,27 @@ export class ContractDetailComponent implements OnInit, OnDestroy {
   contrato: Contrato | null = null;
   alertaCritica = false;
   private destroy$ = new Subject<void>();
-  private audio: HTMLAudioElement;
+  private audio: HTMLAudioElement | null = null;
 
   constructor(private route: ActivatedRoute, private apiService: ApiService) {
-    this.audio = new Audio('assets/sounds/alert.mp3');
-    this.audio.load();
+    // Audio solo existe en el navegador; en SSR (Node) la clase no está definida.
+    if (typeof Audio !== 'undefined') {
+      this.audio = new Audio('assets/sounds/alert.mp3');
+      this.audio.load();
+    }
   }
 
   ngOnInit(): void {
     this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = Number(params.get('id'));
-      this.apiService.getContratoDetalle(id).subscribe(contrato => {
-        this.contrato = contrato;
-        this.checkAlertStatus(contrato);
+      this.apiService.getContratoDetalle(id).subscribe({
+        next: contrato => {
+          this.contrato = contrato;
+          this.checkAlertStatus(contrato);
+        },
+        error: err => {
+          console.warn(`No se pudo cargar el contrato ${id}.`, err?.message ?? err);
+        },
       });
     });
   }
@@ -51,6 +59,10 @@ export class ContractDetailComponent implements OnInit, OnDestroy {
   }
 
   async playAlertSound(): Promise<void> {
+    if (!this.audio) {
+      return;
+    }
+
     try {
       await this.audio.play();
     } catch (err) {
