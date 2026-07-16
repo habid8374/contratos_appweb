@@ -59,6 +59,9 @@ def database_from_url(url: str) -> dict[str, str]:
         'PASSWORD': unquote(parsed.password or ''),
         'HOST': parsed.hostname or '',
         'PORT': str(parsed.port or 5432),
+        # Falla rapido y con error claro en los logs si la BD no es alcanzable,
+        # en vez de colgarse hasta que expire el healthcheck.
+        'OPTIONS': {'connect_timeout': 10},
     }
 
 
@@ -94,6 +97,12 @@ if RAILWAY_PUBLIC_DOMAIN:
     railway_origin = f'https://{RAILWAY_PUBLIC_DOMAIN}'
     if railway_origin not in CSRF_TRUSTED_ORIGINS:
         CSRF_TRUSTED_ORIGINS.append(railway_origin)
+
+if ON_RAILWAY:
+    # El healthcheck de Railway llega con Host: healthcheck.railway.app;
+    # sin esto Django lo rechaza con 400 y el deploy se marca fallido.
+    if 'healthcheck.railway.app' not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append('healthcheck.railway.app')
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -161,6 +170,7 @@ DATABASES = {
         'PASSWORD': os.getenv('POSTGRES_PASSWORD') or os.getenv('PGPASSWORD', 'postgres'),
         'HOST': os.getenv('POSTGRES_HOST') or os.getenv('PGHOST', 'localhost'),
         'PORT': os.getenv('POSTGRES_PORT') or os.getenv('PGPORT', '5432'),
+        'OPTIONS': {'connect_timeout': 10},
     }
 }
 
