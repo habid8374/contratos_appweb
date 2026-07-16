@@ -9,6 +9,9 @@ def anexo_upload_path(instance, filename):
     # Guarda el archivo en una carpeta con el ID del contrato para mantener el orden
     return f'contratos/{instance.contrato.id}/anexos/{filename}'
 
+def negociacion_upload_path(instance, filename):
+    return f'contratos/{instance.id or "nuevo"}/negociacion/{filename}'
+
 class Administradora(models.Model):
     class Regimen(models.TextChoices):
         SUBSIDIADO = 'SUB', _('Subsidiado')
@@ -22,8 +25,15 @@ class Administradora(models.Model):
         max_length=3,
         choices=Regimen.choices,
         default=Regimen.OTRO,
-        help_text='Régimen que administra la EAPB/EPS.',
+        help_text='Régimen que administra la EAPB/EPS (un mismo NIT puede manejar ambos).',
     )
+    ciudad = models.CharField(max_length=120, blank=True)
+    departamento = models.CharField(max_length=120, blank=True)
+    codigo_postal = models.CharField(max_length=20, blank=True)
+    correo = models.EmailField(blank=True)
+
+    class Meta:
+        ordering = ['nombre']
 
     def __str__(self):
         return self.nombre
@@ -41,11 +51,18 @@ class Contrato(models.Model):
     numero_contrato = models.CharField(max_length=100, unique=True, db_index=True)
     administradora = models.ForeignKey(Administradora, on_delete=models.PROTECT, related_name='contratos')
     modalidad = models.CharField(max_length=3, choices=Modalidad.choices, default=Modalidad.EVENTO)
-    objeto = models.TextField()
+    objeto = models.TextField(blank=True)
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     valor_total = models.DecimalField(max_digits=19, decimal_places=2, null=True, blank=True)
     estado = models.CharField(max_length=3, choices=Estado.choices, default=Estado.ACTIVO)
+    documento_negociacion = models.FileField(
+        upload_to=negociacion_upload_path, null=True, blank=True,
+        help_text='PDF de la negociación del contrato.',
+    )
+
+    class Meta:
+        ordering = ['-fecha_inicio']
 
     def __str__(self):
         return f"{self.numero_contrato} - {self.administradora.nombre}"

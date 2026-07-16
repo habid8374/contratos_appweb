@@ -1,17 +1,19 @@
 
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from .views import (
-    BuscadorContratoView,
-    ContratoDetalleView,
-    TarifasContratoView,
+    AdministradoraViewSet,
+    ContratoViewSet,
     AnexoUploadView,
     MeView,
 )
 
+router = DefaultRouter()
+router.register('administradoras', AdministradoraViewSet, basename='administradora')
+router.register('contratos', ContratoViewSet, basename='contrato')
+
 urlpatterns = [
     path('auth/me/', MeView.as_view(), name='me'),
-    path('contratos/buscar/', BuscadorContratoView.as_view(), name='buscar-contratos'),
-    path('contratos/<int:pk>/', ContratoDetalleView.as_view(), name='detalle-contrato'),
-    path('contratos/<int:pk>/tarifas/', TarifasContratoView.as_view(), name='tarifas-contrato'),
     path('anexos/', AnexoUploadView.as_view(), name='cargar-anexo'),
+    path('', include(router.urls)),
 ]

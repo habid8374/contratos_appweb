@@ -9,7 +9,12 @@
   </div>
 }
 
-<a routerLink="/buscar" class="volver">← Volver al buscador</a>
+<div class="barra-top">
+  <a routerLink="/buscar" class="volver">← Volver al buscador</a>
+  @if (contrato(); as c) {
+    <a [routerLink]="['/contratos', c.id, 'editar']" class="btn btn-outline btn-sm">Editar contrato</a>
+  }
+</div>
 
 @if (contrato(); as c) {
   <section class="detalle">
@@ -30,6 +35,16 @@
     @if (c.objeto) {
       <p class="objeto"><span>Objeto:</span> {{ c.objeto }}</p>
     }
+
+    <div class="doc">
+      @if (c.documento_negociacion) {
+        <a [href]="c.documento_negociacion" target="_blank" class="btn btn-outline btn-sm">
+          📄 Ver documento de negociación
+        </a>
+      } @else {
+        <span class="doc-vacio">Sin documento de negociación cargado.</span>
+      }
+    </div>
   </section>
 
   <section class="tarifas">

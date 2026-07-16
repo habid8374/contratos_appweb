@@ -27,15 +27,29 @@
   }
 }
 
-.volver {
-  display: inline-block;
+.barra-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 1rem;
+}
+
+.volver {
   color: var(--teal);
   text-decoration: none;
   font-size: 0.9rem;
 
   &:hover {
     text-decoration: underline;
+  }
+}
+
+.doc {
+  margin-top: 1.25rem;
+
+  .doc-vacio {
+    color: var(--muted);
+    font-size: 0.9rem;
   }
 }
 

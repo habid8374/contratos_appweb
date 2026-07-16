@@ -1,14 +1,25 @@
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework import viewsets, status
 from rest_framework.views import APIView
+from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.parsers import MultiPartParser, FormParser
-from django.db.models import Q
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from django.db.models import Q, ProtectedError
 from django.shortcuts import get_object_or_404
+
+from .models import Contrato, Administradora, AnexoTarifario, DetalleTarifa
+from .serializers import (
+    AdministradoraSerializer,
+    ContratoBusquedaSerializer,
+    ContratoDetalleSerializer,
+    ContratoEscrituraSerializer,
+    DetalleTarifaSerializer,
+    AnexoTarifarioSerializer,
+)
+from .services.excel_processor import ExcelTarifarioProcessor
 
 
 class MeView(APIView):
-    """Devuelve los datos del usuario autenticado (para el frontend)."""
+    """Datos del usuario autenticado (para el frontend)."""
 
     def get(self, request):
         u = request.user
@@ -20,60 +31,74 @@ class MeView(APIView):
             'is_staff': u.is_staff,
         })
 
-from .models import Contrato, AnexoTarifario, DetalleTarifa
-from .serializers import (
-    ContratoBusquedaSerializer,
-    ContratoDetalleSerializer,
-    DetalleTarifaSerializer,
-    AnexoTarifarioSerializer,
-)
-from .services.excel_processor import ExcelTarifarioProcessor
 
-
-class BuscadorContratoView(ListAPIView):
-    serializer_class = ContratoBusquedaSerializer
+class AdministradoraViewSet(viewsets.ModelViewSet):
+    queryset = Administradora.objects.all()
+    serializer_class = AdministradoraSerializer
 
     def get_queryset(self):
-        query = self.request.query_params.get('q', None)
-        if query:
-            return Contrato.objects.select_related('administradora').filter(
-                Q(administradora__nombre__icontains=query) |
-                Q(administradora__nit__icontains=query) |
-                Q(numero_contrato__icontains=query)
-            ).filter(estado=Contrato.Estado.ACTIVO).order_by('administradora__nombre')
-        return Contrato.objects.none()
-
-
-class ContratoDetalleView(RetrieveAPIView):
-    serializer_class = ContratoDetalleSerializer
-    queryset = Contrato.objects.select_related('administradora').all()
-
-
-class TarifasContratoView(ListAPIView):
-    """Tarifas (DetalleTarifa) de todos los anexos de un contrato, con búsqueda local."""
-    serializer_class = DetalleTarifaSerializer
-
-    def get_queryset(self):
-        contrato_id = self.kwargs['pk']
-        qs = DetalleTarifa.objects.filter(
-            anexo_origen__contrato_id=contrato_id
-        ).order_by('codigo_cups')
-        query = self.request.query_params.get('q')
-        if query:
-            qs = qs.filter(
-                Q(codigo_cups__icontains=query) |
-                Q(descripcion__icontains=query)
-            )
+        qs = super().get_queryset()
+        q = self.request.query_params.get('q')
+        if q:
+            qs = qs.filter(Q(nombre__icontains=q) | Q(nit__icontains=q))
         return qs
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except ProtectedError:
+            return Response(
+                {'error': 'No se puede eliminar: la administradora tiene contratos asociados.'},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+
+class ContratoViewSet(viewsets.ModelViewSet):
+    queryset = Contrato.objects.select_related('administradora', 'alerta').all()
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_serializer_class(self):
+        if self.action in ('create', 'update', 'partial_update'):
+            return ContratoEscrituraSerializer
+        if self.action == 'list':
+            return ContratoBusquedaSerializer
+        return ContratoDetalleSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        administradora = self.request.query_params.get('administradora')
+        if administradora:
+            qs = qs.filter(administradora_id=administradora)
+        return qs
+
+    @action(detail=False, methods=['get'], url_path='buscar')
+    def buscar(self, request):
+        query = request.query_params.get('q')
+        if not query:
+            return Response([])
+        contratos = Contrato.objects.select_related('administradora').filter(
+            Q(administradora__nombre__icontains=query) |
+            Q(administradora__nit__icontains=query) |
+            Q(numero_contrato__icontains=query)
+        ).filter(estado=Contrato.Estado.ACTIVO).order_by('administradora__nombre')
+        return Response(ContratoBusquedaSerializer(contratos, many=True).data)
+
+    @action(detail=True, methods=['get'], url_path='tarifas')
+    def tarifas(self, request, pk=None):
+        qs = DetalleTarifa.objects.filter(anexo_origen__contrato_id=pk).order_by('codigo_cups')
+        query = request.query_params.get('q')
+        if query:
+            qs = qs.filter(Q(codigo_cups__icontains=query) | Q(descripcion__icontains=query))
+        return Response(DetalleTarifaSerializer(qs, many=True).data)
+
+    @action(detail=True, methods=['get'], url_path='anexos')
+    def anexos(self, request, pk=None):
+        anexos = AnexoTarifario.objects.filter(contrato_id=pk).order_by('-fecha_carga')
+        return Response(AnexoTarifarioSerializer(anexos, many=True).data)
 
 
 class AnexoUploadView(APIView):
-    """Sube un Excel de tarifas, lo procesa y vuelca las filas a DetalleTarifa.
-
-    El Excel se procesa en memoria: no se depende de que el archivo persista
-    en disco (el disco de Railway es efímero). La fuente de verdad de los datos
-    queda en la tabla DetalleTarifa (PostgreSQL).
-    """
+    """Sube un Excel de tarifas, lo procesa (en memoria) y vuelca a DetalleTarifa."""
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request):
@@ -95,8 +120,7 @@ class AnexoUploadView(APIView):
         )
 
         try:
-            procesador = ExcelTarifarioProcessor(anexo, file_obj=archivo)
-            filas = procesador.process()
+            filas = ExcelTarifarioProcessor(anexo, file_obj=archivo).process()
         except Exception as exc:
             anexo.delete()
             return Response(

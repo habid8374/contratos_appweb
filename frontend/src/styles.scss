@@ -1,1 +1,195 @@
-/* You can add global styles to this file, and also import other style files */
+/* Estilos globales — paleta Axentia */
+:root {
+  --navy: #14283b;
+  --navy-700: #1d3852;
+  --teal: #1e8b9c;
+  --teal-600: #17727f;
+  --bg: #f4f6f8;
+  --text: #1f2a37;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --danger: #b91c1c;
+  --ok: #14683a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Botones */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 9px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.btn-primary {
+  background: var(--teal);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--teal-600);
+}
+.btn-outline {
+  background: transparent;
+  border-color: var(--navy);
+  color: var(--navy);
+}
+.btn-outline:hover {
+  background: var(--navy);
+  color: #fff;
+}
+.btn-danger {
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.btn-danger:hover {
+  background: var(--danger);
+  color: #fff;
+}
+.btn-sm {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.82rem;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Tarjetas */
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+/* Cabecera de página */
+.page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.page-head h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--navy);
+}
+
+/* Formularios */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151;
+}
+.form-field.full {
+  grid-column: 1 / -1;
+}
+.form-field input,
+.form-field select,
+.form-field textarea {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(30, 139, 156, 0.15);
+}
+.form-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+/* Mensajes */
+.msg-error {
+  color: var(--danger);
+  font-size: 0.88rem;
+}
+.msg-ok {
+  color: var(--ok);
+  background: #e7f6ec;
+  border-radius: 9px;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+/* Tablas */
+.tabla-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+table.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background: #fff;
+}
+table.tabla th,
+table.tabla td {
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid #f1f3f5;
+  white-space: nowrap;
+}
+table.tabla th {
+  background: #f8fafc;
+  color: var(--navy);
+  font-weight: 600;
+}
+table.tabla tbody tr:hover {
+  background: rgba(30, 139, 156, 0.05);
+}
+
+/* Chips */
+.chip {
+  display: inline-block;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.chip-teal {
+  background: rgba(30, 139, 156, 0.12);
+  color: var(--teal-600);
+}
+.chip-ok {
+  background: #e7f6ec;
+  color: var(--ok);
+}
+.chip-no {
+  background: #fdeaea;
+  color: var(--danger);
+}

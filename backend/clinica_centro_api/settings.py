@@ -223,6 +223,27 @@ STORAGES = {
     },
 }
 
+# Almacenamiento de archivos (PDF de negociación, etc.) en Cloudflare R2 u otro
+# servicio compatible con S3, si está configurado. El disco de Railway es
+# efímero, así que sin esto los archivos subidos se pierden al redesplegar.
+R2_ACCESS_KEY_ID = os.getenv('R2_ACCESS_KEY_ID')
+if R2_ACCESS_KEY_ID:
+    STORAGES['default'] = {
+        'BACKEND': 'storages.backends.s3.S3Storage',
+        'OPTIONS': {
+            'access_key': R2_ACCESS_KEY_ID,
+            'secret_key': os.getenv('R2_SECRET_ACCESS_KEY'),
+            'bucket_name': os.getenv('R2_BUCKET_NAME'),
+            'endpoint_url': os.getenv('R2_ENDPOINT_URL'),
+            'region_name': os.getenv('R2_REGION', 'auto'),
+            'signature_version': 's3v4',
+            'default_acl': None,
+            'querystring_auth': True,
+            'querystring_expire': int(os.getenv('R2_URL_EXPIRE', '3600')),
+            'file_overwrite': False,
+        },
+    }
+
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
