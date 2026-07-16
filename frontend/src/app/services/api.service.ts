@@ -40,6 +40,7 @@ export interface Contrato {
 
 export interface Tarifa {
   id: number;
+  hoja: string;
   codigo_cups: string;
   descripcion: string;
   tipo_tecnologia: string;
@@ -55,6 +56,7 @@ export interface ResultadoCarga {
   id: number;
   nombre_anexo: string;
   filas_procesadas: number;
+  resumen_hojas: Record<string, number | string>;
 }
 
 export interface AlertaResumen {

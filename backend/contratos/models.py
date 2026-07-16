@@ -92,14 +92,17 @@ class DetalleTarifa(models.Model):
         INSUMO = 'I', _('Insumo')
 
     anexo_origen = models.ForeignKey(AnexoTarifario, on_delete=models.CASCADE, related_name='detalles')
-    codigo_cups = models.CharField(max_length=20, db_index=True)
-    descripcion = models.CharField(max_length=500)
-    tipo_tecnologia = models.CharField(max_length=1, choices=TipoTecnologia.choices)
+    hoja = models.CharField(max_length=120, blank=True, default='', db_index=True,
+                            help_text='Hoja del Excel de la que provino la fila.')
+    codigo_cups = models.CharField(max_length=60, db_index=True)
+    descripcion = models.CharField(max_length=500, blank=True, default='')
+    tipo_tecnologia = models.CharField(max_length=1, choices=TipoTecnologia.choices,
+                                       default=TipoTecnologia.PROCEDIMIENTO)
     esta_incluido = models.BooleanField(default=True)
-    manual_referencia = models.CharField(max_length=50)
-    tarifa_base = models.DecimalField(max_digits=14, decimal_places=2)
-    porcentaje_pactado = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
-    valor_final = models.DecimalField(max_digits=14, decimal_places=2, editable=False)
+    manual_referencia = models.CharField(max_length=120, blank=True, default='')
+    tarifa_base = models.DecimalField(max_digits=16, decimal_places=2, default=0)
+    porcentaje_pactado = models.DecimalField(max_digits=6, decimal_places=2, default=0.0)
+    valor_final = models.DecimalField(max_digits=16, decimal_places=2, editable=False, default=0)
 
     @staticmethod
     def computar_valor_final(tarifa_base, porcentaje_pactado):
@@ -116,4 +119,4 @@ class DetalleTarifa(models.Model):
         return f"{self.codigo_cups} - {self.descripcion}"
 
     class Meta:
-        unique_together = ('anexo_origen', 'codigo_cups')
+        ordering = ['hoja', 'codigo_cups']

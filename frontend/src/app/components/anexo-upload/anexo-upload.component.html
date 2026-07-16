@@ -48,10 +48,19 @@
     }
 
     @if (resultado(); as r) {
-      <p class="upload-ok">
-        ✔ Anexo "{{ r.nombre_anexo }}" cargado. Se procesaron
-        <strong>{{ r.filas_procesadas }}</strong> filas de tarifas.
-      </p>
+      <div class="upload-ok">
+        <p>
+          ✔ Anexo "{{ r.nombre_anexo }}" cargado. Se procesaron
+          <strong>{{ r.filas_procesadas }}</strong> filas de tarifas.
+        </p>
+        @if (r.resumen_hojas) {
+          <ul class="resumen-hojas">
+            @for (h of hojas(r.resumen_hojas); track h.nombre) {
+              <li><strong>{{ h.nombre }}:</strong> {{ h.valor }}</li>
+            }
+          </ul>
+        }
+      </div>
     }
 
     <button type="button" class="upload-btn" (click)="subir()" [disabled]="cargando()">

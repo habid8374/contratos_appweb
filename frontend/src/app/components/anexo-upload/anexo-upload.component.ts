@@ -47,6 +47,13 @@ export class AnexoUploadComponent {
     this.archivo = input.files?.[0] ?? null;
   }
 
+  hojas(resumen: Record<string, number | string>): { nombre: string; valor: number | string }[] {
+    return Object.entries(resumen).map(([nombre, valor]) => ({
+      nombre,
+      valor: typeof valor === 'number' ? `${valor} filas` : valor,
+    }));
+  }
+
   subir(): void {
     const c = this.contrato();
     if (!c || !this.archivo) {
