@@ -2,6 +2,7 @@ import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Usuario {
   id: number;
@@ -24,25 +25,26 @@ export class AuthService {
   private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
+  private readonly apiUrl = environment.apiUrl;
 
   readonly usuario = signal<Usuario | null>(null);
 
   login(username: string, password: string): Observable<TokenPair> {
     return this.http
-      .post<TokenPair>('/api/auth/token/', { username, password })
+      .post<TokenPair>(`${this.apiUrl}/api/auth/token/`, { username, password })
       .pipe(tap((tokens) => this.guardarTokens(tokens)));
   }
 
   cargarUsuario(): Observable<Usuario> {
     return this.http
-      .get<Usuario>('/api/auth/me/')
+      .get<Usuario>(`${this.apiUrl}/api/auth/me/`)
       .pipe(tap((u) => this.usuario.set(u)));
   }
 
   refrescar(): Observable<{ access: string }> {
     const refresh = this.getRefresh();
     return this.http
-      .post<{ access: string }>('/api/auth/token/refresh/', { refresh })
+      .post<{ access: string }>(`${this.apiUrl}/api/auth/token/refresh/`, { refresh })
       .pipe(tap(({ access }) => this.setItem(ACCESS_KEY, access)));
   }
 
