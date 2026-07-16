@@ -1,6 +1,9 @@
 
 from rest_framework import serializers
-from .models import Contrato, Administradora, AnexoTarifario, DetalleTarifa, AlertaContrato
+from .models import (
+    Contrato, Administradora, AnexoTarifario, DetalleTarifa, AlertaContrato,
+    NotaTecnica, LineaNotaTecnica,
+)
 
 
 class AdministradoraSerializer(serializers.ModelSerializer):
@@ -113,3 +116,21 @@ class AnexoTarifarioSerializer(serializers.ModelSerializer):
         model = AnexoTarifario
         fields = ['id', 'contrato', 'nombre_anexo', 'archivo_excel', 'fecha_carga', 'total_detalles']
         read_only_fields = ['fecha_carga']
+
+
+class LineaNotaTecnicaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LineaNotaTecnica
+        fields = ['id', 'codigo', 'descripcion', 'frecuencia_esperada', 'valor_unitario', 'valor_total']
+
+
+class NotaTecnicaSerializer(serializers.ModelSerializer):
+    contrato_numero = serializers.CharField(source='contrato.numero_contrato', read_only=True)
+    total_lineas = serializers.IntegerField(source='lineas.count', read_only=True)
+
+    class Meta:
+        model = NotaTecnica
+        fields = [
+            'id', 'contrato', 'contrato_numero', 'anio', 'mes', 'poblacion',
+            'valor_global', 'observaciones', 'total_lineas',
+        ]

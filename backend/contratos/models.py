@@ -128,3 +128,60 @@ class DetalleTarifa(models.Model):
 
     class Meta:
         ordering = ['hoja', 'codigo_cups']
+
+
+# ---------------------------------------------------------------------------
+# Módulo PGP (Pago Global Prospectivo): nota técnica y control de consumo
+# ---------------------------------------------------------------------------
+
+class NotaTecnica(models.Model):
+    """Presupuesto mensual de un contrato PGP, según la nota técnica pactada."""
+    contrato = models.ForeignKey(Contrato, on_delete=models.CASCADE, related_name='notas_tecnicas')
+    anio = models.PositiveIntegerField()
+    mes = models.PositiveSmallIntegerField(help_text='1 = enero … 12 = diciembre.')
+    poblacion = models.PositiveIntegerField(default=0, help_text='Afiliados cubiertos en el mes.')
+    valor_global = models.DecimalField(
+        max_digits=18, decimal_places=2, default=0,
+        help_text='Techo presupuestal del mes (valor global del PGP).',
+    )
+    observaciones = models.TextField(blank=True, default='')
+    creado = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('contrato', 'anio', 'mes')
+        ordering = ['-anio', '-mes']
+
+    def __str__(self):
+        return f"Nota técnica {self.contrato.numero_contrato} {self.mes:02d}/{self.anio}"
+
+
+class LineaNotaTecnica(models.Model):
+    """Actividad presupuestada dentro de una nota técnica."""
+    nota_tecnica = models.ForeignKey(NotaTecnica, on_delete=models.CASCADE, related_name='lineas')
+    codigo = models.CharField(max_length=60, db_index=True)
+    descripcion = models.CharField(max_length=500, blank=True, default='')
+    frecuencia_esperada = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    valor_unitario = models.DecimalField(max_digits=16, decimal_places=2, default=0)
+    valor_total = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+
+    class Meta:
+        ordering = ['codigo']
+
+    def __str__(self):
+        return f"{self.codigo} ({self.nota_tecnica_id})"
+
+
+class RegistroConsumo(models.Model):
+    """Servicio realmente prestado (ejecución) de un contrato PGP."""
+    contrato = models.ForeignKey(Contrato, on_delete=models.CASCADE, related_name='consumos')
+    fecha = models.DateField(db_index=True)
+    codigo = models.CharField(max_length=60, db_index=True, blank=True, default='')
+    descripcion = models.CharField(max_length=500, blank=True, default='')
+    cantidad = models.DecimalField(max_digits=14, decimal_places=2, default=1)
+    valor_total = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+
+    class Meta:
+        ordering = ['fecha']
+
+    def __str__(self):
+        return f"{self.fecha} {self.codigo} ({self.contrato_id})"

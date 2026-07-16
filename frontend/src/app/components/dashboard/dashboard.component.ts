@@ -27,6 +27,12 @@ export class DashboardComponent {
       icono: '🏢',
     },
     {
+      titulo: 'Control PGP',
+      descripcion: 'Seguimiento del consumo vs la nota técnica de contratos PGP.',
+      ruta: '/pgp',
+      icono: '📊',
+    },
+    {
       titulo: 'Alertas de vencimiento',
       descripcion: 'Contratos por vencer y vencidos, según los días configurados.',
       ruta: '/alertas',
