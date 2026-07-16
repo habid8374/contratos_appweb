@@ -60,12 +60,22 @@ export class ContractDetailComponent implements OnInit, OnDestroy {
     if (!contrato.fecha_fin) {
       return;
     }
-    const fechaFin = new Date(contrato.fecha_fin);
-    const hoy = new Date();
-    const diffDays = Math.ceil((fechaFin.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+    // Preferir los días ya calculados por el backend; si no, calcular localmente.
+    let diffDays = contrato.dias_para_vencer ?? null;
+    if (diffDays === null) {
+      const fechaFin = new Date(contrato.fecha_fin);
+      const hoy = new Date();
+      diffDays = Math.ceil((fechaFin.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+    }
     this.diasRestantes.set(diffDays);
 
-    if (diffDays <= 90) {
+    // Umbral configurado en el contrato (días previos de la alerta); 90 por defecto.
+    const umbral =
+      contrato.alerta?.activa && contrato.alerta?.dias_previos
+        ? contrato.alerta.dias_previos
+        : 90;
+
+    if (diffDays <= umbral) {
       this.alertaCritica.set(true);
       this.reproducirAlerta();
     }

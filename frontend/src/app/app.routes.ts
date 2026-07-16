@@ -26,6 +26,12 @@ export const routes: Routes = [
       import('./components/anexo-upload/anexo-upload.component').then((m) => m.AnexoUploadComponent),
   },
   {
+    path: 'alertas',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./components/alertas/alertas.component').then((m) => m.AlertasComponent),
+  },
+  {
     path: 'administradoras',
     canActivate: [authGuard],
     loadComponent: () =>
