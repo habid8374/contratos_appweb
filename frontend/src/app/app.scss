@@ -1,0 +1,22 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+.app-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+
+  .app-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    text-decoration: none;
+  }
+}
+
+.app-main {
+  padding: 1.5rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
