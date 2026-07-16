@@ -82,6 +82,32 @@ Verifica: `https://<tu-backend>.up.railway.app/api/health/` debe responder `{"st
    ese origen por **CORS**: define en Railway
    `DJANGO_CORS_ALLOWED_ORIGINS=https://tu-frontend.vercel.app`.
 
+## 2b. Archivos (PDF) en Cloudflare R2
+
+Para que los PDF de negociación persistan (el disco de Railway es efímero),
+crea un bucket R2 y un API Token (Object Read & Write), y define en el backend:
+
+| Variable | Valor |
+|---|---|
+| `R2_ACCESS_KEY_ID` | Access Key ID del token |
+| `R2_SECRET_ACCESS_KEY` | Secret Access Key del token |
+| `R2_BUCKET_NAME` | nombre del bucket, p. ej. `contratosappweb` |
+| `R2_ENDPOINT_URL` | `https://<account-id>.r2.cloudflarestorage.com` (sin el bucket) |
+
+Sin estas variables el sistema funciona, pero el PDF se guarda en disco local
+(se pierde al redesplegar).
+
+## 2c. Alertas de vencimiento automáticas (cron)
+
+El panel **Alertas** del frontend muestra siempre los contratos por vencer. Para
+enviar además el **correo** automático, programa un cron en Railway:
+
+1. Crea un servicio nuevo desde el mismo repositorio, **Root Directory** `backend`.
+2. En **Settings → Cron Schedule** pon `0 13 * * *` (8:00 a. m. Colombia).
+3. **Start command**: `python manage.py check_contract_alerts`.
+4. Dale las mismas variables que el backend (`DATABASE_URL`, y las de correo SMTP:
+   `DJANGO_EMAIL_BACKEND`, `EMAIL_HOST`, etc., más `ALERTAS_RECIPIENTS`).
+
 ## 3. CORS (imprescindible)
 
 El frontend (SPA) llama al backend desde el navegador y en otro dominio, así

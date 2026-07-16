@@ -27,6 +27,12 @@ export class DashboardComponent {
       icono: '🏢',
     },
     {
+      titulo: 'Alertas de vencimiento',
+      descripcion: 'Contratos por vencer y vencidos, según los días configurados.',
+      ruta: '/alertas',
+      icono: '⏰',
+    },
+    {
       titulo: 'Buscar contratos',
       descripcion: 'Consulta contratos por administradora, NIT o número.',
       ruta: '/buscar',

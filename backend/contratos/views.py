@@ -96,6 +96,39 @@ class ContratoViewSet(viewsets.ModelViewSet):
         anexos = AnexoTarifario.objects.filter(contrato_id=pk).order_by('-fecha_carga')
         return Response(AnexoTarifarioSerializer(anexos, many=True).data)
 
+    @action(detail=False, methods=['get'], url_path='alertas')
+    def alertas(self, request):
+        """Contratos activos ordenados por vencimiento, marcando los que ya
+        entraron en su ventana de alerta configurada."""
+        from datetime import date
+        hoy = date.today()
+        contratos = (
+            Contrato.objects.select_related('administradora', 'alerta')
+            .filter(estado=Contrato.Estado.ACTIVO)
+            .order_by('fecha_fin')
+        )
+        data = []
+        for c in contratos:
+            dias = (c.fecha_fin - hoy).days if c.fecha_fin else None
+            alerta = getattr(c, 'alerta', None)
+            dias_previos = alerta.dias_previos if (alerta and alerta.activa) else None
+            en_alerta = (
+                dias is not None and dias_previos is not None and dias <= dias_previos
+            )
+            data.append({
+                'id': c.id,
+                'numero_contrato': c.numero_contrato,
+                'administradora': c.administradora.nombre,
+                'fecha_inicio': c.fecha_inicio,
+                'fecha_fin': c.fecha_fin,
+                'dias_para_vencer': dias,
+                'dias_previos': dias_previos,
+                'alerta_activa': bool(alerta and alerta.activa),
+                'en_alerta': en_alerta,
+                'vencido': dias is not None and dias < 0,
+            })
+        return Response(data)
+
 
 class AnexoUploadView(APIView):
     """Sube un Excel de tarifas, lo procesa (en memoria) y vuelca a DetalleTarifa."""

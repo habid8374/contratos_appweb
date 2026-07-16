@@ -57,6 +57,19 @@ export interface ResultadoCarga {
   filas_procesadas: number;
 }
 
+export interface AlertaResumen {
+  id: number;
+  numero_contrato: string;
+  administradora: string;
+  fecha_inicio: string;
+  fecha_fin: string;
+  dias_para_vencer: number | null;
+  dias_previos: number | null;
+  alerta_activa: boolean;
+  en_alerta: boolean;
+  vencido: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly baseUrl = `${environment.apiUrl}/api`;
@@ -89,6 +102,9 @@ export class ApiService {
   }
   buscarContratos(query: string): Observable<Contrato[]> {
     return this.http.get<Contrato[]>(`${this.baseUrl}/contratos/buscar/`, { params: { q: query } });
+  }
+  getAlertas(): Observable<AlertaResumen[]> {
+    return this.http.get<AlertaResumen[]>(`${this.baseUrl}/contratos/alertas/`);
   }
   getContratoDetalle(id: number): Observable<Contrato> {
     return this.http.get<Contrato>(`${this.baseUrl}/contratos/${id}/`);
