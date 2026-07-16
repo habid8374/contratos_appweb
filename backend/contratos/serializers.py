@@ -50,8 +50,9 @@ class ContratoDetalleSerializer(serializers.ModelSerializer):
         model = Contrato
         fields = [
             'id', 'numero_contrato', 'administradora', 'modalidad', 'objeto',
-            'fecha_inicio', 'fecha_fin', 'valor_total', 'estado',
-            'documento_negociacion', 'alerta', 'dias_para_vencer',
+            'fecha_inicio', 'fecha_fin', 'valor_total', 'manual_referencia',
+            'porcentaje_negociado', 'estado', 'documento_negociacion', 'alerta',
+            'dias_para_vencer',
         ]
 
     def get_dias_para_vencer(self, obj):
@@ -69,8 +70,8 @@ class ContratoEscrituraSerializer(serializers.ModelSerializer):
         model = Contrato
         fields = [
             'id', 'numero_contrato', 'administradora', 'modalidad', 'objeto',
-            'fecha_inicio', 'fecha_fin', 'valor_total', 'estado',
-            'documento_negociacion', 'alerta',
+            'fecha_inicio', 'fecha_fin', 'valor_total', 'manual_referencia',
+            'porcentaje_negociado', 'estado', 'documento_negociacion', 'alerta',
         ]
 
     def create(self, validated_data):

@@ -25,6 +25,12 @@
       <div><span>NIT</span><strong>{{ c.administradora?.nit }}</strong></div>
       <div><span>Régimen</span><strong>{{ c.regimen_estimado || c.administradora?.regimen_display }}</strong></div>
       <div><span>Modalidad</span><strong>{{ c.modalidad }}</strong></div>
+      @if (c.manual_referencia) {
+        <div><span>Manual</span><strong>{{ c.manual_referencia }}</strong></div>
+      }
+      @if (c.porcentaje_negociado && +c.porcentaje_negociado !== 0) {
+        <div><span>% pactado</span><strong>+{{ c.porcentaje_negociado }}%</strong></div>
+      }
       <div><span>Estado</span><strong>{{ c.estado }}</strong></div>
       <div><span>Vigencia</span><strong>{{ c.fecha_inicio }} → {{ c.fecha_fin }}</strong></div>
       @if (c.valor_total) {
