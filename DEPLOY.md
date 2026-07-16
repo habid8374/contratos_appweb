@@ -29,8 +29,10 @@ La app tiene dos partes que se despliegan por separado:
 
 5. En **Settings → Networking** genera el dominio público (`Generate Domain`).
 6. Despliega. El `backend/railway.json` ya define:
-   - migraciones antes de cada deploy (`preDeployCommand`),
-   - `collectstatic` + gunicorn como comando de arranque,
+   - migraciones + `collectstatic` + gunicorn como comando de arranque,
+   - gunicorn enlazado a `[::]` (IPv6): el healthcheck y la red privada de
+     Railway son IPv6; con `0.0.0.0` el healthcheck falla con
+     "service unavailable",
    - healthcheck en `/api/health/`.
 
    El archivo `backend/.python-version` fija **Python 3.13** (Django 6 requiere
