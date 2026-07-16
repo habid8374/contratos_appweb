@@ -32,6 +32,11 @@ export const routes: Routes = [
       import('./components/alertas/alertas.component').then((m) => m.AlertasComponent),
   },
   {
+    path: 'pgp',
+    canActivate: [authGuard],
+    loadComponent: () => import('./components/pgp/pgp.component').then((m) => m.PgpComponent),
+  },
+  {
     path: 'administradoras',
     canActivate: [authGuard],
     loadComponent: () =>

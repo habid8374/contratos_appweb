@@ -1,0 +1,138 @@
+<div class="page-head">
+  <h1>Control PGP</h1>
+</div>
+
+<div class="card selector">
+  <label class="form-field full">
+    <span>Contrato PGP</span>
+    <input type="text" [formControl]="busqueda" placeholder="Busca por administradora, NIT o número…" autocomplete="off" />
+  </label>
+
+  @if (resultados().length && !contrato()) {
+    <ul class="sugerencias">
+      @for (c of resultados(); track c.id) {
+        <li (click)="seleccionar(c)">
+          <strong>{{ c.numero_contrato }}</strong>
+          <span>{{ c.administradora?.nombre }}</span>
+        </li>
+      }
+    </ul>
+  }
+
+  <div class="periodo">
+    <label class="form-field">
+      <span>Año</span>
+      <select [value]="anio()" (change)="anio.set(+$any($event.target).value); cambiarPeriodo()">
+        @for (a of anios; track a) { <option [value]="a">{{ a }}</option> }
+      </select>
+    </label>
+    <label class="form-field">
+      <span>Mes</span>
+      <select [value]="mes()" (change)="mes.set(+$any($event.target).value); cambiarPeriodo()">
+        @for (m of meses; track $index) { <option [value]="$index + 1">{{ m }}</option> }
+      </select>
+    </label>
+  </div>
+</div>
+
+@if (mensaje()) { <p class="msg-ok">{{ mensaje() }}</p> }
+@if (error()) { <p class="msg-error">{{ error() }}</p> }
+
+@if (contrato() && tablero(); as t) {
+  <div class="acciones-carga card">
+    <div class="carga-item">
+      <span class="carga-titulo">Nota técnica (presupuesto)</span>
+      <label class="btn btn-outline btn-sm carga-btn">
+        Cargar Excel
+        <input type="file" accept=".xlsx,.xls" (change)="onNotaFile($event)" hidden />
+      </label>
+    </div>
+    <div class="carga-item">
+      <span class="carga-titulo">Consumo (ejecución)</span>
+      <label class="btn btn-outline btn-sm carga-btn">
+        Cargar Excel
+        <input type="file" accept=".xlsx,.xls" (change)="onConsumoFile($event)" hidden />
+      </label>
+    </div>
+  </div>
+
+  @if (!t.tiene_nota) {
+    <p class="aviso">Aún no hay nota técnica para este periodo. Carga el Excel del presupuesto para ver el control.</p>
+  }
+
+  <div class="tiles">
+    <div class="tile">
+      <span class="lbl">Techo del mes</span>
+      <span class="num">$ {{ fmt(t.techo) }}</span>
+    </div>
+    <div class="tile">
+      <span class="lbl">Ejecutado</span>
+      <span class="num">$ {{ fmt(t.total_ejecutado) }}</span>
+    </div>
+    <div class="tile" [class.tile-danger]="(t.porcentaje_ejecucion ?? 0) > 100">
+      <span class="lbl">% Ejecución</span>
+      <span class="num">{{ t.porcentaje_ejecucion !== null ? t.porcentaje_ejecucion + '%' : '—' }}</span>
+    </div>
+    <div class="tile" [class.tile-danger]="(t.saldo ?? 0) < 0">
+      <span class="lbl">Saldo</span>
+      <span class="num">{{ t.saldo !== null ? '$ ' + fmt(t.saldo) : '—' }}</span>
+    </div>
+    <div class="tile">
+      <span class="lbl">Población</span>
+      <span class="num">{{ fmt(t.poblacion) }}</span>
+    </div>
+  </div>
+
+  @if (t.porcentaje_ejecucion !== null) {
+    <div class="barra-ejec">
+      <div class="barra-fill" [class.over]="t.porcentaje_ejecucion > 100"
+           [style.width.%]="t.porcentaje_ejecucion > 100 ? 100 : t.porcentaje_ejecucion"></div>
+    </div>
+  }
+
+  @if (t.serie_diaria.length) {
+    <section class="serie">
+      <h2>Consumo por día</h2>
+      <div class="barras">
+        @for (d of t.serie_diaria; track d.fecha) {
+          <div class="barra" [title]="d.fecha + ': $' + fmt(d.valor)">
+            <div class="barra-col" [style.height.%]="(d.valor / maxSerie()) * 100"></div>
+            <span class="barra-lbl">{{ d.fecha.slice(8, 10) }}</span>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  @if (t.actividades.length) {
+    <section class="actividades">
+      <h2>Ejecución por actividad</h2>
+      <div class="tabla-wrap">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Descripción</th>
+              <th class="num">Presupuestado</th>
+              <th class="num">Ejecutado</th>
+              <th class="num">%</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of t.actividades; track a.codigo) {
+              <tr [class.over]="pct(a) !== null && pct(a)! > 100" [class.extra]="a.valor_presupuestado === 0">
+                <td>{{ a.codigo }}</td>
+                <td>{{ a.descripcion }}</td>
+                <td class="num">{{ fmt(a.valor_presupuestado) }}</td>
+                <td class="num">{{ fmt(a.valor_ejecutado) }}</td>
+                <td class="num">{{ pct(a) !== null ? pct(a) + '%' : '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+} @else if (contrato() && cargando()) {
+  <p class="aviso">Cargando tablero…</p>
+}

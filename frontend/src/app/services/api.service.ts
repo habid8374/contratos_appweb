@@ -75,6 +75,39 @@ export interface AlertaResumen {
   vencido: boolean;
 }
 
+export interface NotaTecnica {
+  id: number;
+  contrato: number;
+  anio: number;
+  mes: number;
+  poblacion: number;
+  valor_global: string;
+  total_lineas?: number;
+}
+
+export interface ActividadPgp {
+  codigo: string;
+  descripcion: string;
+  frecuencia_esperada: number;
+  valor_presupuestado: number;
+  cantidad_ejecutada: number;
+  valor_ejecutado: number;
+}
+
+export interface TableroPgp {
+  anio: number;
+  mes: number;
+  tiene_nota: boolean;
+  poblacion: number;
+  techo: number;
+  total_ejecutado: number;
+  saldo: number | null;
+  porcentaje_ejecucion: number | null;
+  total_registros: number;
+  actividades: ActividadPgp[];
+  serie_diaria: { fecha: string; valor: number }[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly baseUrl = `${environment.apiUrl}/api`;
@@ -141,5 +174,37 @@ export class ApiService {
     form.append('nombre_anexo', nombreAnexo);
     form.append('archivo_excel', archivo);
     return this.http.post<ResultadoCarga>(`${this.baseUrl}/anexos/`, form);
+  }
+
+  // ---- PGP ----
+  getTableroPgp(contratoId: number, anio: number, mes: number): Observable<TableroPgp> {
+    return this.http.get<TableroPgp>(`${this.baseUrl}/contratos/${contratoId}/pgp/`, {
+      params: { anio: String(anio), mes: String(mes) },
+    });
+  }
+  getNotaTecnica(contratoId: number, anio: number, mes: number): Observable<NotaTecnica[]> {
+    return this.http.get<NotaTecnica[]>(`${this.baseUrl}/notas-tecnicas/`, {
+      params: { contrato: String(contratoId), anio: String(anio), mes: String(mes) },
+    });
+  }
+  crearNotaTecnica(contratoId: number, anio: number, mes: number, poblacion: number): Observable<NotaTecnica> {
+    return this.http.post<NotaTecnica>(`${this.baseUrl}/notas-tecnicas/`, {
+      contrato: contratoId, anio, mes, poblacion,
+    });
+  }
+  cargarNotaTecnica(notaId: number, archivo: File): Observable<NotaTecnica & { lineas_procesadas: number }> {
+    const form = new FormData();
+    form.append('archivo_excel', archivo);
+    return this.http.post<NotaTecnica & { lineas_procesadas: number }>(
+      `${this.baseUrl}/notas-tecnicas/${notaId}/cargar/`, form,
+    );
+  }
+  cargarConsumo(contratoId: number, anio: number, mes: number, archivo: File): Observable<{ registros_procesados: number }> {
+    const form = new FormData();
+    form.append('contrato', String(contratoId));
+    form.append('anio', String(anio));
+    form.append('mes', String(mes));
+    form.append('archivo_excel', archivo);
+    return this.http.post<{ registros_procesados: number }>(`${this.baseUrl}/consumo/`, form);
   }
 }
