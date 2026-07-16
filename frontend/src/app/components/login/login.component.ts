@@ -41,10 +41,26 @@ export class LoginComponent {
           this.cargando.set(false);
           this.router.navigate(['/']);
         },
-        error: () => {
+        error: (err) => {
           this.cargando.set(false);
-          this.error.set('Usuario o contraseña incorrectos.');
+          this.error.set(this.mensajeError(err?.status));
         },
       });
+  }
+
+  private mensajeError(status?: number): string {
+    switch (status) {
+      case 401:
+        return 'Usuario o contraseña incorrectos.';
+      case 0:
+        return 'No se pudo conectar con el servidor. Revisa tu conexión.';
+      case 404:
+      case 500:
+      case 502:
+      case 503:
+        return 'El servidor no responde. Verifica que API_TARGET_URL esté configurada en el frontend.';
+      default:
+        return `No se pudo iniciar sesión${status ? ` (error ${status})` : ''}.`;
+    }
   }
 }
