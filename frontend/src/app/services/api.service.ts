@@ -38,6 +38,7 @@ export interface Contrato {
   documento_negociacion?: string | null;
   alerta?: Alerta | null;
   dias_para_vencer?: number | null;
+  total_tarifas?: number;
 }
 
 export interface Tarifa {

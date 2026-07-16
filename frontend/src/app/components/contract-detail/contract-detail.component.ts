@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, of, switchMap, takeUntil, tap } from 'rxjs';
 import { ApiService, Contrato, Tarifa } from '../../services/api.service';
 
 @Component({
@@ -19,6 +19,8 @@ export class ContractDetailComponent implements OnInit, OnDestroy {
   tarifas = signal<Tarifa[]>([]);
   diasRestantes = signal<number | null>(null);
   alertaCritica = signal(false);
+  consultando = signal(false);
+  hayBusqueda = signal(false);
 
   filtroTarifas = new FormControl('', { nonNullable: true });
 
@@ -36,24 +38,37 @@ export class ContractDetailComponent implements OnInit, OnDestroy {
         error: (err) =>
           console.warn(`No se pudo cargar el contrato ${this.contratoId}.`, err?.message ?? err),
       });
-      this.cargarTarifas('');
     });
 
+    // No se carga todo el catálogo: se consulta por código/descripción.
     this.filtroTarifas.valueChanges
       .pipe(
         takeUntil(this.destroy$),
         debounceTime(300),
         distinctUntilChanged(),
-        switchMap((q) => this.apiService.getTarifas(this.contratoId, q || '')),
+        tap((q) => {
+          const term = (q || '').trim();
+          this.hayBusqueda.set(term.length >= 2);
+          this.consultando.set(term.length >= 2);
+          if (term.length < 2) {
+            this.tarifas.set([]);
+          }
+        }),
+        switchMap((q) => {
+          const term = (q || '').trim();
+          return term.length >= 2
+            ? this.apiService.getTarifas(this.contratoId, term)
+            : of([] as Tarifa[]);
+        }),
       )
-      .subscribe((t) => this.tarifas.set(t));
+      .subscribe((t) => {
+        this.tarifas.set(t);
+        this.consultando.set(false);
+      });
   }
 
-  private cargarTarifas(q: string): void {
-    this.apiService.getTarifas(this.contratoId, q).subscribe({
-      next: (t) => this.tarifas.set(t),
-      error: () => this.tarifas.set([]),
-    });
+  formatoValor(v: string | number): string {
+    return Number(v).toLocaleString('es-CO');
   }
 
   checkAlertStatus(contrato: Contrato): void {

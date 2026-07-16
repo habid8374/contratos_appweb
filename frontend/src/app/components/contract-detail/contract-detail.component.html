@@ -54,50 +54,57 @@
   </section>
 
   <section class="tarifas">
-    <h2>Tarifas del contrato</h2>
-    <input
-      type="text"
-      class="tarifas-filtro"
-      [formControl]="filtroTarifas"
-      placeholder="Filtrar por código CUPS o descripción…"
-      autocomplete="off"
-    />
+    <div class="tarifas-head">
+      <h2>Consultar tarifas</h2>
+      @if (c.total_tarifas) {
+        <span class="tarifas-total">{{ formatoValor(c.total_tarifas) }} tarifas cargadas</span>
+      }
+    </div>
 
-    @if (tarifas().length) {
-      <div class="tabla-wrap">
-        <table class="tabla-tarifas">
-          <thead>
-            <tr>
-              <th>Categoría</th>
-              <th>Código</th>
-              <th>Descripción</th>
-              <th>Tipo</th>
-              <th>Incluido</th>
-              <th>Manual</th>
-              <th class="num">Valor</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (t of tarifas(); track t.id) {
-              <tr>
-                <td>{{ t.hoja }}</td>
-                <td>{{ t.codigo_cups }}</td>
-                <td>{{ t.descripcion }}</td>
-                <td>{{ t.tipo_tecnologia_display }}</td>
-                <td>
-                  @if (t.esta_incluido) {
-                    <span class="chip si">Sí</span>
-                  } @else {
-                    <span class="chip no">No</span>
+    @if (c.total_tarifas) {
+      <input
+        type="text"
+        class="tarifas-filtro"
+        [formControl]="filtroTarifas"
+        placeholder="Escribe un código o descripción…"
+        autocomplete="off"
+      />
+
+      @if (consultando()) {
+        <p class="tarifas-msg">Buscando…</p>
+      } @else if (tarifas().length) {
+        <ul class="tarifa-list">
+          @for (t of tarifas(); track t.id) {
+            <li class="tarifa-item">
+              <div class="t-info">
+                <div class="t-top">
+                  <span class="t-cups">{{ t.codigo_cups }}</span>
+                  @if (t.hoja) {
+                    <span class="chip chip-teal">{{ t.hoja }}</span>
                   }
-                </td>
-                <td>{{ t.manual_referencia }}</td>
-                <td class="num destacado">{{ t.valor_final }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+                  @if (!t.esta_incluido) {
+                    <span class="chip chip-no">Excluido</span>
+                  }
+                </div>
+                <div class="t-desc">{{ t.descripcion }}</div>
+              </div>
+              <div class="t-valor">
+                <span class="t-valor-num">$ {{ formatoValor(t.valor_final) }}</span>
+                @if (c.porcentaje_negociado && +c.porcentaje_negociado !== 0) {
+                  <span class="t-valor-nota">incluye +{{ c.porcentaje_negociado }}%</span>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+        @if (tarifas().length >= 100) {
+          <p class="tarifas-msg">Mostrando los primeros 100 resultados. Refina la búsqueda.</p>
+        }
+      } @else if (hayBusqueda()) {
+        <p class="tarifas-msg">Sin resultados para esa búsqueda.</p>
+      } @else {
+        <p class="tarifas-msg">Escribe un código CUPS/CUM o parte de la descripción para consultar.</p>
+      }
     } @else {
       <p class="sin-tarifas">
         No hay tarifas cargadas para este contrato.

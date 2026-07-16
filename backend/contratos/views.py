@@ -85,10 +85,16 @@ class ContratoViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='tarifas')
     def tarifas(self, request, pk=None):
-        qs = DetalleTarifa.objects.filter(anexo_origen__contrato_id=pk).order_by('codigo_cups')
-        query = request.query_params.get('q')
-        if query:
-            qs = qs.filter(Q(codigo_cups__icontains=query) | Q(descripcion__icontains=query))
+        query = (request.query_params.get('q') or '').strip()
+        # Se consulta por código/descripción: sin término no se devuelve todo
+        # el catálogo (pueden ser miles de filas).
+        if not query:
+            return Response([])
+        qs = (
+            DetalleTarifa.objects.filter(anexo_origen__contrato_id=pk)
+            .filter(Q(codigo_cups__icontains=query) | Q(descripcion__icontains=query))
+            .order_by('codigo_cups')[:100]
+        )
         return Response(DetalleTarifaSerializer(qs, many=True).data)
 
     @action(detail=True, methods=['get'], url_path='anexos')

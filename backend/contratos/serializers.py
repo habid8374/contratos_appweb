@@ -45,6 +45,7 @@ class ContratoDetalleSerializer(serializers.ModelSerializer):
     administradora = AdministradoraSerializer(read_only=True)
     alerta = AlertaContratoSerializer(read_only=True)
     dias_para_vencer = serializers.SerializerMethodField()
+    total_tarifas = serializers.SerializerMethodField()
 
     class Meta:
         model = Contrato
@@ -52,7 +53,7 @@ class ContratoDetalleSerializer(serializers.ModelSerializer):
             'id', 'numero_contrato', 'administradora', 'modalidad', 'objeto',
             'fecha_inicio', 'fecha_fin', 'valor_total', 'manual_referencia',
             'porcentaje_negociado', 'estado', 'documento_negociacion', 'alerta',
-            'dias_para_vencer',
+            'dias_para_vencer', 'total_tarifas',
         ]
 
     def get_dias_para_vencer(self, obj):
@@ -60,6 +61,9 @@ class ContratoDetalleSerializer(serializers.ModelSerializer):
         if not obj.fecha_fin:
             return None
         return (obj.fecha_fin - date.today()).days
+
+    def get_total_tarifas(self, obj):
+        return DetalleTarifa.objects.filter(anexo_origen__contrato=obj).count()
 
 
 class ContratoEscrituraSerializer(serializers.ModelSerializer):
