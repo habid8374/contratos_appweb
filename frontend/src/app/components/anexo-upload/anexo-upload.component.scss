@@ -1,0 +1,124 @@
+:host {
+  --navy: #14283b;
+  --teal: #1e8b9c;
+  --teal-600: #17727f;
+  display: block;
+}
+
+.upload-title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--navy);
+}
+
+.upload-sub {
+  margin: 0.25rem 0 1.25rem;
+  color: #6b7280;
+}
+
+.upload-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1.5rem;
+  max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151;
+
+  input[type='text'],
+  input[type='file'] {
+    padding: 0.6rem 0.7rem;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    font-size: 0.95rem;
+
+    &:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(30, 139, 156, 0.15);
+    }
+  }
+}
+
+.sugerencias {
+  list-style: none;
+  margin: -0.5rem 0 0;
+  padding: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    padding: 0.6rem 0.8rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f3f5;
+
+    span {
+      font-size: 0.82rem;
+      color: #6b7280;
+    }
+
+    &:hover {
+      background: rgba(30, 139, 156, 0.08);
+    }
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+.contrato-sel {
+  font-size: 0.9rem;
+  color: var(--navy);
+  background: rgba(30, 139, 156, 0.1);
+  border-radius: 9px;
+  padding: 0.6rem 0.75rem;
+}
+
+.upload-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.88rem;
+}
+
+.upload-ok {
+  margin: 0;
+  color: #14683a;
+  background: #e7f6ec;
+  border-radius: 9px;
+  padding: 0.7rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.upload-btn {
+  align-self: flex-start;
+  padding: 0.7rem 1.3rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--teal);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--teal-600);
+  }
+  &:disabled {
+    opacity: 0.7;
+    cursor: default;
+  }
+}

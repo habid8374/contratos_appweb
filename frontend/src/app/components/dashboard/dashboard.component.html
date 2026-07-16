@@ -1,0 +1,18 @@
+<section class="dash">
+  <header class="dash-head">
+    <h1>Panel principal</h1>
+    @if (auth.usuario(); as u) {
+      <p class="dash-hello">Hola, {{ u.nombre }}</p>
+    }
+  </header>
+
+  <div class="dash-grid">
+    @for (a of acciones; track a.ruta) {
+      <a [routerLink]="a.ruta" class="dash-card">
+        <span class="dash-icon">{{ a.icono }}</span>
+        <span class="dash-card-title">{{ a.titulo }}</span>
+        <span class="dash-card-desc">{{ a.descripcion }}</span>
+      </a>
+    }
+  </div>
+</section>

@@ -30,10 +30,11 @@ class Command(BaseCommand):
     def enviar_correo_alerta(self, contrato: Contrato, alerta: AlertaContrato):
         dias_restantes = (contrato.fecha_fin - date.today()).days
         asunto = f"ALERTA CRÍTICA: Vencimiento de Contrato - {contrato.administradora.nombre} ({dias_restantes} días restantes)"
+        base_url = getattr(settings, 'FRONTEND_BASE_URL', 'http://localhost:4200')
         context = {
             'contrato': contrato,
             'dias_restantes': dias_restantes,
-            'link_gestion': f"http://localhost:4200/contratos/{contrato.id}"
+            'link_gestion': f"{base_url}/contratos/{contrato.id}"
         }
         html_message = f\"\"\"
         <div style="font-family: Arial, sans-serif; border: 2px solid #D32F2F; padding: 20px;">
@@ -42,11 +43,18 @@ class Command(BaseCommand):
             <a href="{context['link_gestion']}" style="background-color: #1976D2; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px;">Gestionar Contrato</a>
         </div>
         \"\"\"
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@clinicacentro.com')
+        recipients = getattr(settings, 'ALERTAS_RECIPIENTS', [])
+        if not recipients:
+            self.stdout.write(self.style.WARNING(
+                "No hay destinatarios configurados (ALERTAS_RECIPIENTS); se omite el envío."
+            ))
+            return
         send_mail(
             subject=asunto,
             message=f"El contrato {contrato.numero_contrato} vence en {dias_restantes} días.",
-            from_email='noreply@clinicacentro.com',
-            recipient_list=['equipo.contratacion@example.com'],
+            from_email=from_email,
+            recipient_list=recipients,
             html_message=html_message,
             fail_silently=False,
         )

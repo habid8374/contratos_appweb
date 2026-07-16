@@ -1,13 +1,89 @@
-<div *ngIf="alertaCritica" style="background-color: #D32F2F; color: white; padding: 1rem; text-align: center; font-weight: bold; animation: pulse 1.5s infinite;">
-  ¡ALERTA! Este contrato está próximo a vencer.
-</div>
+@if (alertaCritica()) {
+  <div class="alerta-critica">
+    ⚠️ ¡ALERTA! Este contrato vence
+    @if (diasRestantes() !== null) {
+      en {{ diasRestantes() }} días.
+    } @else {
+      pronto.
+    }
+  </div>
+}
 
-<div *ngIf="contrato" style="padding: 2rem;">
-  <h1>Detalle del Contrato</h1>
-  <p><strong>Número:</strong> {{ contrato.numero_contrato }}</p>
-  <p><strong>Administradora:</strong> {{ contrato.administradora?.nombre }}</p>
-  <p><strong>Modalidad:</strong> {{ contrato.modalidad }}</p>
-  <p><strong>Fecha fin:</strong> {{ contrato.fecha_fin }}</p>
-  <p><strong>Estado:</strong> {{ contrato.estado }}</p>
-  <p><strong>Objeto:</strong> {{ contrato.objeto }}</p>
-</div>
+<a routerLink="/buscar" class="volver">← Volver al buscador</a>
+
+@if (contrato(); as c) {
+  <section class="detalle">
+    <h1 class="detalle-title">Contrato {{ c.numero_contrato }}</h1>
+
+    <div class="datos">
+      <div><span>Administradora</span><strong>{{ c.administradora?.nombre }}</strong></div>
+      <div><span>NIT</span><strong>{{ c.administradora?.nit }}</strong></div>
+      <div><span>Régimen</span><strong>{{ c.regimen_estimado || c.administradora?.regimen_display }}</strong></div>
+      <div><span>Modalidad</span><strong>{{ c.modalidad }}</strong></div>
+      <div><span>Estado</span><strong>{{ c.estado }}</strong></div>
+      <div><span>Vigencia</span><strong>{{ c.fecha_inicio }} → {{ c.fecha_fin }}</strong></div>
+      @if (c.valor_total) {
+        <div><span>Valor total</span><strong>{{ c.valor_total }}</strong></div>
+      }
+    </div>
+
+    @if (c.objeto) {
+      <p class="objeto"><span>Objeto:</span> {{ c.objeto }}</p>
+    }
+  </section>
+
+  <section class="tarifas">
+    <h2>Tarifas del contrato</h2>
+    <input
+      type="text"
+      class="tarifas-filtro"
+      [formControl]="filtroTarifas"
+      placeholder="Filtrar por código CUPS o descripción…"
+      autocomplete="off"
+    />
+
+    @if (tarifas().length) {
+      <div class="tabla-wrap">
+        <table class="tabla-tarifas">
+          <thead>
+            <tr>
+              <th>CUPS</th>
+              <th>Descripción</th>
+              <th>Tipo</th>
+              <th>Incluido</th>
+              <th>Manual</th>
+              <th class="num">Base</th>
+              <th class="num">%</th>
+              <th class="num">Final</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of tarifas(); track t.id) {
+              <tr>
+                <td>{{ t.codigo_cups }}</td>
+                <td>{{ t.descripcion }}</td>
+                <td>{{ t.tipo_tecnologia_display }}</td>
+                <td>
+                  @if (t.esta_incluido) {
+                    <span class="chip si">Sí</span>
+                  } @else {
+                    <span class="chip no">No</span>
+                  }
+                </td>
+                <td>{{ t.manual_referencia }}</td>
+                <td class="num">{{ t.tarifa_base }}</td>
+                <td class="num">{{ t.porcentaje_pactado }}</td>
+                <td class="num destacado">{{ t.valor_final }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p class="sin-tarifas">
+        No hay tarifas cargadas para este contrato.
+        <a routerLink="/cargar">Cargar un anexo →</a>
+      </p>
+    }
+  </section>
+}

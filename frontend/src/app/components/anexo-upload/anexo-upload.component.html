@@ -1,0 +1,61 @@
+<section class="upload">
+  <h1 class="upload-title">Cargar anexo de tarifas</h1>
+  <p class="upload-sub">
+    Busca el contrato, adjunta el Excel y súbelo. Los datos reemplazan los del anexo anterior.
+  </p>
+
+  <div class="upload-card">
+    <label class="field">
+      <span>1. Contrato</span>
+      <input
+        type="text"
+        [formControl]="busqueda"
+        placeholder="Busca por administradora, NIT o número…"
+        autocomplete="off"
+      />
+    </label>
+
+    @if (resultados().length && !contrato()) {
+      <ul class="sugerencias">
+        @for (c of resultados(); track c.id) {
+          <li (click)="seleccionar(c)">
+            <strong>{{ c.numero_contrato }}</strong>
+            <span>{{ c.administradora?.nombre }} · NIT {{ c.administradora?.nit }}</span>
+          </li>
+        }
+      </ul>
+    }
+
+    @if (contrato(); as c) {
+      <div class="contrato-sel">
+        Contrato seleccionado: <strong>{{ c.numero_contrato }}</strong> ·
+        {{ c.administradora?.nombre }}
+      </div>
+    }
+
+    <label class="field">
+      <span>2. Nombre del anexo (opcional)</span>
+      <input type="text" [formControl]="nombreAnexo" placeholder="Ej: Tarifario 2026" />
+    </label>
+
+    <label class="field">
+      <span>3. Archivo Excel</span>
+      <input type="file" accept=".xlsx,.xls" (change)="onArchivo($event)" />
+    </label>
+
+    @if (error()) {
+      <p class="upload-error">{{ error() }}</p>
+    }
+
+    @if (resultado(); as r) {
+      <p class="upload-ok">
+        ✔ Anexo "{{ r.nombre_anexo }}" cargado. Se procesaron
+        <strong>{{ r.filas_procesadas }}</strong> filas de tarifas.
+      </p>
+    }
+
+    <button type="button" class="upload-btn" (click)="subir()" [disabled]="cargando()">
+      {{ cargando() ? 'Procesando…' : 'Subir y procesar' }}
+    </button>
+  </div>
+</section>

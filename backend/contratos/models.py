@@ -10,8 +10,20 @@ def anexo_upload_path(instance, filename):
     return f'contratos/{instance.contrato.id}/anexos/{filename}'
 
 class Administradora(models.Model):
+    class Regimen(models.TextChoices):
+        SUBSIDIADO = 'SUB', _('Subsidiado')
+        CONTRIBUTIVO = 'CON', _('Contributivo')
+        AMBOS = 'AMB', _('Ambos')
+        OTRO = 'OTR', _('Otro')
+
     nombre = models.CharField(max_length=255, unique=True, db_index=True)
     nit = models.CharField(max_length=20, unique=True)
+    regimen = models.CharField(
+        max_length=3,
+        choices=Regimen.choices,
+        default=Regimen.OTRO,
+        help_text='Régimen que administra la EAPB/EPS.',
+    )
 
     def __str__(self):
         return self.nombre
@@ -72,8 +84,15 @@ class DetalleTarifa(models.Model):
     porcentaje_pactado = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
     valor_final = models.DecimalField(max_digits=14, decimal_places=2, editable=False)
 
+    @staticmethod
+    def computar_valor_final(tarifa_base, porcentaje_pactado):
+        from decimal import Decimal
+        tb = Decimal(str(tarifa_base or 0))
+        pp = Decimal(str(porcentaje_pactado or 0))
+        return tb * (1 + pp / Decimal('100'))
+
     def save(self, *args, **kwargs):
-        self.valor_final = self.tarifa_base * (1 + self.porcentaje_pactado / 100)
+        self.valor_final = self.computar_valor_final(self.tarifa_base, self.porcentaje_pactado)
         super().save(*args, **kwargs)
 
     def __str__(self):

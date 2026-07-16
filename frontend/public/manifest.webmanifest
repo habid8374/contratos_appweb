@@ -1,7 +1,9 @@
 {
-  "name": "frontend",
-  "short_name": "frontend",
+  "name": "AppWeb Contratos",
+  "short_name": "Contratos",
   "display": "standalone",
+  "theme_color": "#14283b",
+  "background_color": "#f4f6f8",
   "scope": "./",
   "start_url": "./",
   "icons": [
