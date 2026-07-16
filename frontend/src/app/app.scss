@@ -1,22 +1,126 @@
 :host {
-  display: block;
+  --navy: #14283b;
+  --navy-700: #1d3852;
+  --teal: #1e8b9c;
+  --teal-600: #17727f;
+  --bg: #f4f6f8;
+  --text: #1f2a37;
+  --muted: #6b7280;
+
+  display: flex;
+  flex-direction: column;
   min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
 }
 
 .app-header {
-  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1.5rem;
+  background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(20, 40, 59, 0.06);
 
-  .app-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #111827;
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     text-decoration: none;
+  }
+
+  .brand-logo {
+    height: 40px;
+    width: auto;
+    display: block;
+  }
+
+  .brand-app {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--navy);
+    border-left: 2px solid #e5e7eb;
+    padding-left: 0.75rem;
+  }
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  .nav-link {
+    padding: 0.45rem 0.85rem;
+    border-radius: 8px;
+    color: var(--navy);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.92rem;
+
+    &:hover {
+      background: rgba(30, 139, 156, 0.1);
+      color: var(--teal-600);
+    }
+  }
+
+  .nav-logout {
+    margin-left: 0.35rem;
+    padding: 0.45rem 0.95rem;
+    border: 1px solid var(--navy);
+    background: transparent;
+    color: var(--navy);
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--navy);
+      color: #fff;
+    }
   }
 }
 
 .app-main {
-  padding: 1.5rem;
-  max-width: 960px;
+  flex: 1;
+  width: 100%;
+  max-width: 1040px;
   margin: 0 auto;
+  padding: 1.75rem 1.5rem;
+}
+
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.5rem;
+  background: var(--navy);
+  color: #cdd7e1;
+  font-size: 0.85rem;
+
+  .footer-mark {
+    height: 22px;
+    width: auto;
+  }
+
+  .footer-name {
+    font-weight: 600;
+    color: #ffffff;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+  .brand-app {
+    font-size: 0.95rem;
+  }
 }

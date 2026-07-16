@@ -2,11 +2,8 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   {
-    path: 'contratos/:id',
-    renderMode: RenderMode.Server,
-  },
-  {
+    // Rutas con autenticación y datos dinámicos: render en servidor, sin prerender.
     path: '**',
-    renderMode: RenderMode.Prerender,
+    renderMode: RenderMode.Server,
   },
 ];

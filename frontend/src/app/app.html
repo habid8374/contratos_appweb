@@ -1,7 +1,25 @@
 <header class="app-header">
-  <a routerLink="/" class="app-title">{{ title() }}</a>
+  <a routerLink="/" class="brand">
+    <img src="assets/brand/axentia-logo.png" alt="Axentia Technologies" class="brand-logo" />
+    <span class="brand-app">AppWeb Contratos</span>
+  </a>
+
+  @if (auth.isAuthenticated()) {
+    <nav class="app-nav">
+      <a routerLink="/" class="nav-link">Inicio</a>
+      <a routerLink="/buscar" class="nav-link">Buscar</a>
+      <a routerLink="/cargar" class="nav-link">Cargar</a>
+      <button type="button" class="nav-logout" (click)="cerrarSesion()">Salir</button>
+    </nav>
+  }
 </header>
 
 <main class="app-main">
   <router-outlet />
 </main>
+
+<footer class="app-footer">
+  <span class="powered">Powered by</span>
+  <img src="assets/brand/axentia-mark.png" alt="Axentia" class="footer-mark" />
+  <span class="footer-name">Axentia Technologies</span>
+</footer>

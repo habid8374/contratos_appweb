@@ -1,16 +1,36 @@
 <div class="search-container">
-  <h3>Buscador de Contratos</h3>
-  <input type="text" [formControl]="searchControl" placeholder="Buscar administradora o número de contrato..." />
+  <h1 class="search-title">Buscador de contratos</h1>
+  <input
+    type="text"
+    class="search-input"
+    [formControl]="searchControl"
+    placeholder="Busca por administradora, NIT o número de contrato…"
+    autocomplete="off"
+  />
 
-  <div *ngIf="isLoading" class="loading">Buscando...</div>
+  @if (isLoading) {
+    <div class="loading">Buscando…</div>
+  }
 
-  <ul *ngIf="(resultados$ | async) as resultados">
-    <li *ngFor="let contrato of resultados">
-      <button type="button" (click)="seleccionarContrato(contrato.id)">
-        <strong>{{ contrato.numero_contrato }}</strong>
-        <span>{{ contrato.administradora?.nombre }}</span>
-      </button>
-    </li>
-    <li *ngIf="resultados.length === 0 && searchControl.value">No se encontraron contratos.</li>
-  </ul>
+  @if ((resultados$ | async); as resultados) {
+    <ul class="resultados">
+      @for (contrato of resultados; track contrato.id) {
+        <li>
+          <button type="button" (click)="seleccionarContrato(contrato.id)">
+            <span class="r-num">{{ contrato.numero_contrato }}</span>
+            <span class="r-admin">{{ contrato.administradora?.nombre }}</span>
+            <span class="r-meta">
+              NIT {{ contrato.administradora?.nit }}
+              @if (contrato.regimen_estimado) {
+                · {{ contrato.regimen_estimado }}
+              }
+            </span>
+          </button>
+        </li>
+      }
+      @if (resultados.length === 0 && searchControl.value) {
+        <li class="vacio">No se encontraron contratos.</li>
+      }
+    </ul>
+  }
 </div>

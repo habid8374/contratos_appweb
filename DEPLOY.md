@@ -27,6 +27,29 @@ La app tiene dos partes que se despliegan por separado:
    `settings.py` agrega automáticamente el dominio público de Railway
    (`RAILWAY_PUBLIC_DOMAIN`) y desactiva `DEBUG` cuando corre en Railway.
 
+   Variables opcionales:
+
+   | Variable | Para qué |
+   |---|---|
+   | `JWT_ACCESS_MINUTES` / `JWT_REFRESH_DAYS` | duración de los tokens (por defecto 60 min / 7 días) |
+   | `DJANGO_EMAIL_BACKEND` + `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS` | envío real de correos de alerta (SMTP) |
+   | `DEFAULT_FROM_EMAIL`, `ALERTAS_RECIPIENTS` (lista separada por comas), `FRONTEND_BASE_URL` | remitente, destinatarios y enlace de las alertas de vencimiento |
+
+   **Crear el superusuario (login):** la app exige iniciar sesión. La forma
+   más sencilla es por variables de entorno: define en Railway
+
+   | Variable | Ejemplo |
+   |---|---|
+   | `DJANGO_SUPERUSER_USERNAME` | `admin` |
+   | `DJANGO_SUPERUSER_PASSWORD` | (una contraseña segura) |
+   | `DJANGO_SUPERUSER_EMAIL` | `admin@clinicacentro.com` |
+
+   Al desplegar, el arranque ejecuta `python manage.py ensure_superuser`, que
+   crea ese superusuario (o actualiza su contraseña) de forma idempotente. Los
+   demás usuarios se crean desde `/admin`. No hay registro público (app interna).
+   Alternativamente puedes abrir la **Console** del servicio y ejecutar
+   `python manage.py createsuperuser`.
+
 5. En **Settings → Networking** genera el dominio público (`Generate Domain`).
 6. Despliega. El `backend/railway.json` ya define:
    - migraciones + `collectstatic` + gunicorn como comando de arranque,
@@ -53,7 +76,8 @@ Verifica: `https://<tu-backend>.up.railway.app/api/health/` debe responder `{"st
    | `API_TARGET_URL` | URL del backend en Railway, p. ej. `https://tu-backend.up.railway.app` |
 
    Las llamadas del navegador a `/api/...` las atiende la función
-   `frontend/api/[...path].ts`, que las reenvía al backend.
+   `frontend/api/[...path].ts`, que las reenvía al backend. **Sin esta variable
+   el login y las búsquedas fallan** (el proxy no sabe a dónde reenviar).
 
 5. Despliega. `package.json` fija Node 24 vía `engines` (Angular CLI 22
    requiere Node ≥ 22.22.3; con el Node por defecto el build fallaba).

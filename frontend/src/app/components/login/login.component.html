@@ -1,0 +1,27 @@
+<div class="login-wrap">
+  <div class="login-card">
+    <img src="assets/brand/axentia-logo.png" alt="Axentia Technologies" class="login-logo" />
+    <h1 class="login-title">AppWeb Contratos</h1>
+    <p class="login-sub">Ingresa con tu cuenta para continuar</p>
+
+    <form [formGroup]="form" (ngSubmit)="enviar()" class="login-form">
+      <label class="field">
+        <span>Usuario</span>
+        <input type="text" formControlName="username" autocomplete="username" />
+      </label>
+
+      <label class="field">
+        <span>Contraseña</span>
+        <input type="password" formControlName="password" autocomplete="current-password" />
+      </label>
+
+      @if (error()) {
+        <p class="login-error">{{ error() }}</p>
+      }
+
+      <button type="submit" class="login-btn" [disabled]="cargando()">
+        {{ cargando() ? 'Ingresando…' : 'Ingresar' }}
+      </button>
+    </form>
+  </div>
+</div>
