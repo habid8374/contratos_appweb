@@ -153,7 +153,7 @@ class AnexoUploadView(APIView):
         )
 
         try:
-            filas = ExcelTarifarioProcessor(anexo, file_obj=archivo).process()
+            filas, resumen = ExcelTarifarioProcessor(anexo, file_obj=archivo).process()
         except Exception as exc:
             anexo.delete()
             return Response(
@@ -163,4 +163,5 @@ class AnexoUploadView(APIView):
 
         data = AnexoTarifarioSerializer(anexo).data
         data['filas_procesadas'] = filas
+        data['resumen_hojas'] = resumen
         return Response(data, status=status.HTTP_201_CREATED)

@@ -62,19 +62,19 @@
         <table class="tabla-tarifas">
           <thead>
             <tr>
-              <th>CUPS</th>
+              <th>Categoría</th>
+              <th>Código</th>
               <th>Descripción</th>
               <th>Tipo</th>
               <th>Incluido</th>
               <th>Manual</th>
-              <th class="num">Base</th>
-              <th class="num">%</th>
-              <th class="num">Final</th>
+              <th class="num">Valor</th>
             </tr>
           </thead>
           <tbody>
             @for (t of tarifas(); track t.id) {
               <tr>
+                <td>{{ t.hoja }}</td>
                 <td>{{ t.codigo_cups }}</td>
                 <td>{{ t.descripcion }}</td>
                 <td>{{ t.tipo_tecnologia_display }}</td>
@@ -86,8 +86,6 @@
                   }
                 </td>
                 <td>{{ t.manual_referencia }}</td>
-                <td class="num">{{ t.tarifa_base }}</td>
-                <td class="num">{{ t.porcentaje_pactado }}</td>
                 <td class="num destacado">{{ t.valor_final }}</td>
               </tr>
             }

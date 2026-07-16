@@ -96,7 +96,7 @@ class DetalleTarifaSerializer(serializers.ModelSerializer):
     class Meta:
         model = DetalleTarifa
         fields = [
-            'id', 'codigo_cups', 'descripcion', 'tipo_tecnologia', 'tipo_tecnologia_display',
+            'id', 'hoja', 'codigo_cups', 'descripcion', 'tipo_tecnologia', 'tipo_tecnologia_display',
             'esta_incluido', 'manual_referencia', 'tarifa_base', 'porcentaje_pactado', 'valor_final',
         ]
 
