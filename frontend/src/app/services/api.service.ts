@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Administradora {
   nombre: string;
@@ -45,7 +46,7 @@ export interface ResultadoCarga {
   providedIn: 'root',
 })
 export class ApiService {
-  private readonly baseUrl = '/api';
+  private readonly baseUrl = `${environment.apiUrl}/api`;
   private http = inject(HttpClient);
 
   buscarContratos(query: string): Observable<Contrato[]> {

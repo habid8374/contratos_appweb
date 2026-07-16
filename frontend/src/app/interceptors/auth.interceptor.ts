@@ -9,13 +9,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
-  // No adjuntar token a los propios endpoints de login/refresh.
-  const esAuthEndpoint =
-    req.url.includes('/api/auth/token/') || req.url.includes('/api/auth/token/refresh/');
+  // No adjuntar token a los propios endpoints de login/refresh
+  // (/api/auth/token/ y /api/auth/token/refresh/ comparten este prefijo).
+  const esAuthEndpoint = req.url.includes('/api/auth/token/');
 
   const access = auth.getAccess();
   const authReq =
-    access && req.url.startsWith('/api') && !esAuthEndpoint
+    access && req.url.includes('/api/') && !esAuthEndpoint
       ? req.clone({ setHeaders: { Authorization: `Bearer ${access}` } })
       : req;
 

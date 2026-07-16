@@ -68,59 +68,36 @@ Verifica: `https://<tu-backend>.up.railway.app/api/health/` debe responder `{"st
 1. En Vercel, **Add New → Project** e importa el repositorio.
 2. En **Root Directory** selecciona `frontend` (imprescindible).
 3. Framework preset: deja lo que detecte; `frontend/vercel.json` ya define build,
-   salida (`dist/frontend/browser`) y el rewrite de SPA (excluyendo `/api/`).
-4. En **Settings → Environment Variables** define:
-
-   | Variable | Valor |
-   |---|---|
-   | `API_TARGET_URL` | URL del backend en Railway, p. ej. `https://tu-backend.up.railway.app` |
-
-   Las llamadas del navegador a `/api/...` las atiende la función
-   `frontend/api/[...path].ts`, que las reenvía al backend. **Sin esta variable
-   el login y las búsquedas fallan** (el proxy no sabe a dónde reenviar).
-
-5. Despliega. `package.json` fija Node 24 vía `engines` (Angular CLI 22
+   salida (`dist/frontend/browser`) y el rewrite de SPA.
+4. Despliega. `package.json` fija Node 24 vía `engines` (Angular CLI 22
    requiere Node ≥ 22.22.3; con el Node por defecto el build fallaba).
 
-## 3. Frontend en Railway (alternativa con SSR)
+   El frontend es una **SPA que llama directamente al backend de Railway**. La
+   URL del backend está en `frontend/src/environments/environment.prod.ts`
+   (`apiUrl`). Si cambias el dominio del backend, actualiza esa URL y vuelve a
+   desplegar. **No se necesita configurar `API_TARGET_URL` en Vercel** (ese
+   proxy se eliminó; puedes borrar la variable si la tenías).
 
-1. Crea otro servicio desde el mismo repositorio.
-2. **Root Directory**: `frontend`.
-3. Variables:
+   Como el navegador llama al backend en otro dominio, el backend debe permitir
+   ese origen por **CORS**: define en Railway
+   `DJANGO_CORS_ALLOWED_ORIGINS=https://tu-frontend.vercel.app`.
 
-   | Variable | Valor |
-   |---|---|
-   | `API_TARGET_URL` | URL pública del backend, p. ej. `https://tu-backend.up.railway.app` |
+## 3. CORS (imprescindible)
 
-4. Genera el dominio público. `frontend/railway.json` ya define build y
-   `npm run serve:ssr:frontend` como arranque.
-
-Notas del SSR:
-
-- `angular.json` (`security.allowedHosts`) ya permite `*.up.railway.app`,
-  `*.railway.app`, `*.vercel.app` y `localhost`. Con la lista vacía anterior,
-  **todas las peticiones respondían 400 Bad Request**.
-- Si usas un **dominio propio**, agrégalo a esa lista y vuelve a desplegar, o
-  define la variable de entorno `NG_ALLOWED_HOSTS=mi-dominio.com` en Railway
-  (no requiere rebuild).
-
-## 4. Recordatorio de CORS
-
-Cuando el frontend llama al backend a través del proxy (`/api`), la petición
-sale del servidor del frontend, no del navegador, así que CORS casi no
-interviene. Aun así, configura en el backend:
+El frontend (SPA) llama al backend desde el navegador y en otro dominio, así
+que el backend debe permitir ese origen por CORS. En Railway define:
 
 ```
-DJANGO_CORS_ALLOWED_ORIGINS=https://tu-frontend.vercel.app,https://tu-frontend.up.railway.app
+DJANGO_CORS_ALLOWED_ORIGINS=https://tu-frontend.vercel.app
 ```
 
-## 5. Errores que existían y cómo se corrigieron
+## 4. Errores que existían y cómo se corrigieron
 
 | Síntoma | Causa | Arreglo |
 |---|---|---|
 | Railway (backend): `No matching distribution found for Django<6.1,>=6.0.7` | Django 6 requiere Python ≥ 3.12 y Railway usaba 3.11 | `backend/.python-version` con `3.13` |
 | Vercel/Railway (frontend): `The Angular CLI requires a minimum Node.js version of v22.22.3` | Node por defecto demasiado viejo | `engines: { node: "24.x" }` en `package.json` |
-| Frontend SSR en Railway: toda página responde `400 Bad Request` | `security.allowedHosts: []` en `angular.json` | lista de hosts permitidos con comodines |
-| SSR de `/contratos/:id` devolvía 500 | `new Audio(...)` no existe en Node | se crea el audio solo en el navegador |
+| Vercel: el build fallaba (no generaba `index.html`) | el modo SSR solo generaba `index.csr.html` y Vercel sirve estático | frontend convertido a **SPA** client-side |
+| Vercel: login daba `404`/`504` en `/api/auth/token/` | el proxy serverless de Vercel no funcionaba de forma fiable | el frontend llama **directo** al backend de Railway (con CORS); proxy eliminado |
 | Archivos estáticos del admin sin comprimir/versionar | `STATICFILES_STORAGE` fue eliminado en Django 5.1+ y se ignoraba | migrado a `STORAGES` |
 | 400 en el backend al abrir el dominio de Railway | `ALLOWED_HOSTS` solo tenía localhost | se agrega `RAILWAY_PUBLIC_DOMAIN` automáticamente |
